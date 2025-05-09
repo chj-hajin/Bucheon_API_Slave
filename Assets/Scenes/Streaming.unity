@@ -168,7 +168,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 55527774}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 544788a00e8ca424da751b35b119b3b7, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: f432ca34c325e6e4cb3060630b80d4bb, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -278,6 +278,10 @@ MonoBehaviour:
   videoPlayer: {fileID: 55527776}
   rawImage: {fileID: 55527777}
   maskController: {fileID: 767829376}
+  videoClips:
+  - {fileID: 32900000, guid: c605853444eafb9478a880770f2e6698, type: 3}
+  - {fileID: 32900000, guid: 60c94b939408d004b8480352abc6cd59, type: 3}
+  - {fileID: 32900000, guid: f432ca34c325e6e4cb3060630b80d4bb, type: 3}
 --- !u!1 &502741559
 GameObject:
   m_ObjectHideFlags: 0
