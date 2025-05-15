@@ -16,6 +16,11 @@ public class VideoPlayerManager : MonoBehaviour
     [Header("Video Clips (1번→index=0, 2번→index=1, ...)")]
     public VideoClip[] videoClips;
 
+    private void Start()
+    {
+        maskController.LoadAndApplyMask();
+    }
+
     /// <summary>
     /// 기본 재생 (스케줄용)
     /// </summary>
