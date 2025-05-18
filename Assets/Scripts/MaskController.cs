@@ -1,72 +1,126 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
 
+/// <summary>
+/// MaskController: PlayerPrefs로 마스크 위치/크기 저장 및 편집 모드 지원
+/// </summary>
 public class MaskController : MonoBehaviour
 {
-    public RectTransform[] maskRects; // 마스크 오브젝트 2개
-    public string jsonFileName = "mask_config.json";
-    
-    public void LoadAndApplyMask()
-    {
-        string path = Path.Combine(Application.streamingAssetsPath, jsonFileName);
+    [Header("Mask Settings")]
+    public RectTransform[] maskRects;
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-        StartCoroutine(LoadAndroidJson(path));
-#else
-        if (!File.Exists(path))
+    [Header("Edit Mode Settings")]
+    public float moveStep = 1f;   // WASD 이동 단위
+    public float sizeStep = 1f;   // ZX,CV 크기 조절 단위
+
+    private bool isEditMode = false;
+    private int selectedMaskIndex = -1;
+
+    void Awake()
+    {
+        // Apply saved mask settings on startup
+        ApplyAllMasks();
+    }
+
+    void Update()
+    {
+        // Toggle edit mode: T
+        if (Input.GetKeyDown(KeyCode.T))
         {
-            Debug.LogError("마스크 설정 파일 없음: " + path);
+            isEditMode = !isEditMode;
+            selectedMaskIndex = -1;
+            Debug.Log($"[Mask] EditMode {(isEditMode ? "ON" : "OFF")} ");
+        }
+        if (!isEditMode)
+            return;
+
+        // Exit edit mode: 0
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            isEditMode = false;
+            selectedMaskIndex = -1;
+            SaveAllMaskPrefs();
+            Debug.Log("[Mask] EditMode OFF");
             return;
         }
 
-        string json = File.ReadAllText(path);
-        MaskData maskData = JsonUtility.FromJson<MaskData>(json);
-
-        for (int i = 0; i < maskRects.Length && i < maskData.masks.Length; i++)
+        // Select mask by number keys 1-9
+        for (int i = 0; i < maskRects.Length && i < 9; i++)
         {
-            ApplyMask(maskRects[i], maskData.masks[i]);
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                SelectMask(i);
         }
-#endif
+
+        // Handle edit input for selected mask
+        if (selectedMaskIndex >= 0)
+            HandleEditInput(maskRects[selectedMaskIndex]);
     }
 
-    void ApplyMask(RectTransform rect, MaskBox box)
+    void SelectMask(int idx)
     {
-        // 마스크를 넣을 RectTransform에 적용하기
-        rect.anchorMin = new Vector2(0, 1); // 좌측 상단 기준
-        rect.anchorMax = new Vector2(0, 1);
-        rect.pivot = new Vector2(0, 1);
-        rect.anchoredPosition = new Vector2(box.x, -box.y); // Y축 반전 필요
-        rect.sizeDelta = new Vector2(box.width, box.height);
-
-        // 마스크 빌드 한 뒤에 사이즈 바꾸는 것 적용하기....전체 화면에서 
-        PlayerPrefs.SetFloat("MaskX" + rect.name, box.x);
-        PlayerPrefs.SetFloat("MaskY" + rect.name, -box.y); // Y축 반전 필요
+        selectedMaskIndex = idx;
+        Debug.Log($"[Mask] Selected Mask #{idx + 1}");
     }
 
-    // 마스크 사이즈 적용하기 
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-    IEnumerator LoadAndroidJson(string path)
+    void HandleEditInput(RectTransform rect)
     {
-        using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(path))
+        bool changed = false;
+        Vector2 pos = rect.anchoredPosition;
+        Vector2 size = rect.sizeDelta;
+
+        // Move: WASD (single-step)
+        if (Input.GetKeyDown(KeyCode.W)) { pos.y += moveStep; changed = true; }
+        if (Input.GetKeyDown(KeyCode.S)) { pos.y -= moveStep; changed = true; }
+        if (Input.GetKeyDown(KeyCode.A)) { pos.x -= moveStep; changed = true; }
+        if (Input.GetKeyDown(KeyCode.D)) { pos.x += moveStep; changed = true; }
+
+        // Height: Z/X
+        if (Input.GetKeyDown(KeyCode.Z)) { size.y += sizeStep; changed = true; }
+        if (Input.GetKeyDown(KeyCode.X)) { size.y -= sizeStep; changed = true; }
+
+        // Width: C/V
+        if (Input.GetKeyDown(KeyCode.C)) { size.x += sizeStep; changed = true; }
+        if (Input.GetKeyDown(KeyCode.V)) { size.x -= sizeStep; changed = true; }
+
+        if (changed)
         {
-            yield return www.SendWebRequest();
-
-            if (www.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Android JSON 로드 실패: " + www.error);
-                yield break;
-            }
-
-            string json = www.downloadHandler.text;
-            MaskData maskData = JsonUtility.FromJson<MaskData>(json);
-
-            for (int i = 0; i < maskRects.Length && i < maskData.masks.Length; i++)
-            {
-                ApplyMask(maskRects[i], maskData.masks[i]);
-            }
+            rect.anchoredPosition = pos;
+            rect.sizeDelta = size;
+            SaveMaskPrefs(rect);
+            Debug.Log($"[Mask] Updated Mask #{selectedMaskIndex + 1} Pos={pos}, Size={size}");
         }
     }
-#endif
+
+    void SaveMaskPrefs(RectTransform rect)
+    {
+        string key = rect.name;
+        PlayerPrefs.SetFloat($"MaskX_{key}", rect.anchoredPosition.x);
+        PlayerPrefs.SetFloat($"MaskY_{key}", rect.anchoredPosition.y);
+        PlayerPrefs.SetFloat($"MaskW_{key}", rect.sizeDelta.x);
+        PlayerPrefs.SetFloat($"MaskH_{key}", rect.sizeDelta.y);
+    }
+
+    /// <summary>
+    /// Save all masks to PlayerPrefs
+    /// </summary>
+    void SaveAllMaskPrefs()
+    {
+        foreach (var rect in maskRects)
+            SaveMaskPrefs(rect);
+        PlayerPrefs.Save();
+    }
+
+    void ApplyAllMasks()
+    {
+        foreach (var rect in maskRects)
+        {
+            string key = rect.name;
+            float x = PlayerPrefs.GetFloat($"MaskX_{key}", rect.anchoredPosition.x);
+            float y = PlayerPrefs.GetFloat($"MaskY_{key}", rect.anchoredPosition.y);
+            float w = PlayerPrefs.GetFloat($"MaskW_{key}", rect.sizeDelta.x);
+            float h = PlayerPrefs.GetFloat($"MaskH_{key}", rect.sizeDelta.y);
+            rect.anchoredPosition = new Vector2(x, y);
+            rect.sizeDelta = new Vector2(w, h);
+        }
+    }
 }
