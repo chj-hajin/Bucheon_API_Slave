@@ -168,7 +168,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 55527774}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 82ad7d8b64e63214caf9d94b05f14302, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: f432ca34c325e6e4cb3060630b80d4bb, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -278,9 +278,9 @@ MonoBehaviour:
   videoPlayer: {fileID: 55527776}
   rawImage: {fileID: 55527777}
   videoClips:
-  - {fileID: 32900000, guid: 82ad7d8b64e63214caf9d94b05f14302, type: 3}
-  - {fileID: 32900000, guid: c30df13a6d5eaf1469029e8b4713bb7a, type: 3}
-  - {fileID: 32900000, guid: 82ad7d8b64e63214caf9d94b05f14302, type: 3}
+  - {fileID: 32900000, guid: f432ca34c325e6e4cb3060630b80d4bb, type: 3}
+  - {fileID: 32900000, guid: 60c94b939408d004b8480352abc6cd59, type: 3}
+  - {fileID: 32900000, guid: acf5b70620bca004fbc02f71a8774fc7, type: 3}
 --- !u!1 &502741559
 GameObject:
   m_ObjectHideFlags: 0
@@ -502,7 +502,7 @@ GameObject:
   - component: {fileID: 782766680}
   - component: {fileID: 782766679}
   m_Layer: 5
-  m_Name: Mask1
+  m_Name: Mask_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -522,10 +522,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1793758218}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -58, y: 0}
-  m_SizeDelta: {x: 100, y: 200}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 3640, y: 0}
+  m_SizeDelta: {x: 427, y: 811}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &782766679
 MonoBehaviour:
@@ -577,7 +577,7 @@ GameObject:
   - component: {fileID: 897574454}
   - component: {fileID: 897574453}
   m_Layer: 5
-  m_Name: Mask2
+  m_Name: Mask_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -599,8 +599,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 77, y: 0}
-  m_SizeDelta: {x: 100, y: 200}
+  m_AnchoredPosition: {x: 200, y: 0}
+  m_SizeDelta: {x: 425, y: 810}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &897574453
 MonoBehaviour:
@@ -691,7 +691,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 4524, y: 1130}
+  m_ReferenceResolution: {x: 3840, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -927,8 +927,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 782766678}
   - {fileID: 897574452}
+  - {fileID: 782766678}
   - {fileID: 1842439180}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1022,5 +1022,5 @@ SceneRoots:
   - {fileID: 155619556}
   - {fileID: 767829375}
   - {fileID: 1770764576}
-  - {fileID: 502741562}
   - {fileID: 1471872477}
+  - {fileID: 502741562}

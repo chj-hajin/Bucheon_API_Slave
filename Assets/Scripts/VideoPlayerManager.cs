@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -14,14 +15,38 @@ public class VideoPlayerManager : MonoBehaviour
 
     private IEnumerator PlayVideoCoroutine()
     {
+        // 1) 비디오 준비
         videoPlayer.Prepare();
         while (!videoPlayer.isPrepared)
             yield return null;
 
-        rawImage.texture = videoPlayer.texture;
+        // 2) RenderTexture 생성 및 할당 (원본 해상도 유지)
+        int w = (int)videoPlayer.clip.width;
+        int h = (int)videoPlayer.clip.height;
+
+        if (videoPlayer.targetTexture != null)
+        {
+            var old = videoPlayer.targetTexture;
+            videoPlayer.targetTexture = null;
+            old.Release();
+            Destroy(old);
+        }
+
+        var rt = new RenderTexture(w, h, 0);
+        videoPlayer.targetTexture = rt;
+        rawImage.texture = rt;
+
+        // 3) RawImage를 화면 전체로 스트레치
+        var rect = rawImage.rectTransform;
+        rect.anchorMin = Vector2.zero;   // 좌하단 앵커
+        rect.anchorMax = Vector2.one;    // 우상단 앵커
+        rect.offsetMin = Vector2.zero;   // 앵커 대비 오프셋
+        rect.offsetMax = Vector2.zero;
+
+        // 4) 재생
         videoPlayer.Play();
         videoPlayer.isLooping = true;
-        Debug.Log($"[VideoPlayerManager] Play ▶ {videoPlayer.clip?.name}");
+        Debug.Log($"[VideoPlayerManager] Play ▶ {videoPlayer.clip.name} ({w}×{h}), fullscreen stretch");
     }
 
     public void PlayVideoClip(int index)
@@ -32,25 +57,15 @@ public class VideoPlayerManager : MonoBehaviour
             return;
         }
         videoPlayer.clip = videoClips[index - 1];
-        Debug.Log($"[VideoPlayerManager] Assigned clip: {videoPlayer.clip.name}");
         StopAllCoroutines();
         StartCoroutine(PlayVideoCoroutine());
     }
 
-    /// <summary>
-    /// 기본 첫 번째 영상 재생
-    /// </summary>
-    public void StartVideo()
-    {
-        PlayVideoClip(1);
-    }
+    public void StartVideo() => PlayVideoClip(1);
 
-    /// <summary>
-    /// 지정 시각에 재생 예약
-    /// </summary>
-    public void ScheduleVideo(System.DateTime startTime)
+    public void ScheduleVideo(DateTime startTime)
     {
-        float delay = (float)(startTime - System.DateTime.Now).TotalSeconds;
+        float delay = (float)(startTime - DateTime.Now).TotalSeconds;
         if (delay < 0) delay = 0;
         StartCoroutine(DelayedStart(delay));
         Debug.Log($"[VideoPlayerManager] scheduled in {delay} seconds");
@@ -62,3 +77,4 @@ public class VideoPlayerManager : MonoBehaviour
         StartVideo();
     }
 }
+
