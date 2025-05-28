@@ -38,15 +38,26 @@ public class VideoPlayerManager : MonoBehaviour
 
         // 3) RawImage를 화면 전체로 스트레치
         var rect = rawImage.rectTransform;
-        rect.anchorMin = Vector2.zero;   // 좌하단 앵커
-        rect.anchorMax = Vector2.one;    // 우상단 앵커
-        rect.offsetMin = Vector2.zero;   // 앵커 대비 오프셋
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
 
         // 4) 재생
         videoPlayer.Play();
         videoPlayer.isLooping = true;
         Debug.Log($"[VideoPlayerManager] Play ▶ {videoPlayer.clip.name} ({w}×{h}), fullscreen stretch");
+    }
+
+    void Update()
+    {
+        // 숫자 키 입력으로 즉시 재생
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+            PlayVideoClip(1);
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+            PlayVideoClip(2);
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+            PlayVideoClip(3);
     }
 
     public void PlayVideoClip(int index)
@@ -77,4 +88,3 @@ public class VideoPlayerManager : MonoBehaviour
         StartVideo();
     }
 }
-
